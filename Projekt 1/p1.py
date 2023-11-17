@@ -50,7 +50,7 @@ def srednia_ruchoma(y, H):
     ysr = np.zeros(len(y))
     for i in range(len(y)):
         if i < H:
-            ysr[i] = np.sum(y[0:i]) / (i+1)
+            ysr[i] = None
         else:
             ysr[i] = np.sum(y[i-H:i]) / H
     return ysr
@@ -75,72 +75,72 @@ plt.plot(t, srednia_ruchoma(yZ, H), label="Średnia ruchoma H=20")
 
 plt.legend(loc='upper right')
 p1.show()
+input()
+
+# # Zad 1. Zależność MSE od H'
+# def MSE_OD_H(y, yZ, H_max = 50):
+#     y_MSE = np.zeros(H_max)
+#     for H in range(1, H_max+1):
+#         y_MSE[H-1] = MSE(y, srednia_ruchoma(yZ, H))
+#     return y_MSE, np.argmin(y_MSE) + 1 # H_opt
+
+# y_MSE, H_opt = MSE_OD_H(y, yZ)
+
+# p2 = plt.figure(2)
+# plt.plot(range(1, 50+1), y_MSE)
+# plt.plot(H_opt, y_MSE[H_opt-1], 'ro', label='H_opt = ' + str(H_opt))
+# plt.xlabel('H')
+# plt.ylabel('MSE')
+# plt.title('Zad 1. Zależność MSE od H')
+# plt.legend(loc='upper right')
+# p2.show()
 
 
-# Zad 1. Zależność MSE od H'
-def MSE_OD_H(y, yZ, H_max = 50):
-    y_MSE = np.zeros(H_max)
-    for H in range(1, H_max+1):
-        y_MSE[H-1] = MSE(y, srednia_ruchoma(yZ, H))
-    return y_MSE, np.argmin(y_MSE) + 1 # H_opt
+# # Zad 2. Zależność H_opt od wariancji zakłócenia (średnia z 10 powtórzeń)
+# p3 = plt.figure(3)
+# MAX_Z_MULTIPLY = 5
+# y_H_opt = np.zeros(MAX_Z_MULTIPLY)
+# x_Var_Z = np.zeros(MAX_Z_MULTIPLY)
+# REPEAT_COUNT = 10
 
-y_MSE, H_opt = MSE_OD_H(y, yZ)
-
-p2 = plt.figure(2)
-plt.plot(range(1, 50+1), y_MSE)
-plt.plot(H_opt, y_MSE[H_opt-1], 'ro', label='H_opt = ' + str(H_opt))
-plt.xlabel('H')
-plt.ylabel('MSE')
-plt.title('Zad 1. Zależność MSE od H')
-plt.legend(loc='upper right')
-p2.show()
-
-
-# Zad 2. Zależność H_opt od wariancji zakłócenia (średnia z 10 powtórzeń)
-p3 = plt.figure(3)
-MAX_Z_MULTIPLY = 5
-y_H_opt = np.zeros(MAX_Z_MULTIPLY)
-x_Var_Z = np.zeros(MAX_Z_MULTIPLY)
-REPEAT_COUNT = 10
-
-for ii, z_multiply in enumerate(range(1,MAX_Z_MULTIPLY+1)):
-    H_opts = 0
-    for iii in range(REPEAT_COUNT):
-        yZ = np.zeros(len(y))
-        for i in range(len(y)):
-            yZ[i] = y[i] + z_multiply * Z_trojkatne()
+# for ii, z_multiply in enumerate(range(1,MAX_Z_MULTIPLY+1)):
+#     H_opts = 0
+#     for iii in range(REPEAT_COUNT):
+#         yZ = np.zeros(len(y))
+#         for i in range(len(y)):
+#             yZ[i] = y[i] + z_multiply * Z_trojkatne()
         
-        y_MSE, H_opt = MSE_OD_H(y, yZ)
-        H_opts += H_opt
+#         y_MSE, H_opt = MSE_OD_H(y, yZ)
+#         H_opts += H_opt
 
-    y_H_opt[ii] = H_opts/REPEAT_COUNT
-    x_Var_Z[ii] = Z_trojkatne_wariancja(-1*z_multiply, 1*z_multiply)
-
-
-plt.scatter(x_Var_Z, y_H_opt)
-plt.xlabel('Var(Zk)')
-plt.ylabel('H_opt')
-plt.title('Zad 2. Zależność H_opt od Var(Zk)')
-p3.show()
+#     y_H_opt[ii] = H_opts/REPEAT_COUNT
+#     x_Var_Z[ii] = Z_trojkatne_wariancja(-1*z_multiply, 1*z_multiply)
 
 
-# Zad 3. Zależność MSE od wariancji zakłócenia
-p4 = plt.figure(4)
-y_MSE = np.zeros(MAX_Z_MULTIPLY)
-x_Var_Z = np.zeros(MAX_Z_MULTIPLY)
-for ii, z_multiply in enumerate(range(1,MAX_Z_MULTIPLY+1)):
-    yZ = np.zeros(len(y))
-    for i in range(len(y)):
-        yZ[i] = y[i] + Z_trojkatne(-1*z_multiply, 1*z_multiply)
+# plt.scatter(x_Var_Z, y_H_opt)
+# plt.xlabel('Var(Zk)')
+# plt.ylabel('H_opt')
+# plt.title('Zad 2. Zależność H_opt od Var(Zk)')
+# p3.show()
+
+
+# # Zad 3. Zależność MSE od wariancji zakłócenia
+# p4 = plt.figure(4)
+# y_MSE = np.zeros(MAX_Z_MULTIPLY)
+# x_Var_Z = np.zeros(MAX_Z_MULTIPLY)
+# for ii, z_multiply in enumerate(range(1,MAX_Z_MULTIPLY+1)):
+#     yZ = np.zeros(len(y))
+#     for i in range(len(y)):
+#         yZ[i] = y[i] + Z_trojkatne(-1*z_multiply, 1*z_multiply)
     
-    y_MSE[ii] = MSE(y, yZ)
-    x_Var_Z[ii] = Z_trojkatne_wariancja(-1*z_multiply, 1*z_multiply)
+#     y_MSE[ii] = MSE(y, yZ)
+#     x_Var_Z[ii] = Z_trojkatne_wariancja(-1*z_multiply, 1*z_multiply)
 
     
-plt.scatter(x_Var_Z, y_MSE)
-plt.xlabel('Var(Zk)')
-plt.ylabel('MSE')
-plt.title('Zad 3. Zależność MSE od Var(Zk)')
-p4.show()
+# plt.scatter(x_Var_Z, y_MSE)
+# plt.xlabel('Var(Zk)')
+# plt.ylabel('MSE')
+# plt.title('Zad 3. Zależność MSE od Var(Zk)')
+# p4.show()
 
-input() # keep plots open
+# input() # keep plots open
