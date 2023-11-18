@@ -20,7 +20,7 @@ def Z_trojkatne_wariancja(a=-1, b=1):
     return (a*a + b*b - a*b) / 18
 
 
-
+# ZAD 1 - system statyczny
 def z1():
     # generacja sygnału
     b = [1.5, 0.8, 1.3]
@@ -82,6 +82,7 @@ print("1. Zidentyfikowane parametry b:", b)
 # plt.show()
 
 
+# ZAD 2 - system dynamiczny
 def z2():
     # generacja sygnału
     b = [1.5, 1, 1.3]
