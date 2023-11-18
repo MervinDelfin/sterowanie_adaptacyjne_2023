@@ -2,18 +2,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random, math
 
-# Definiujemy parametry fali
-amplitude = 1
-frequency = 1
-phase = 0
-duration = 2
-
-# Tworzymy os czasu
-t = np.linspace(0, duration, 1000)
-
-# Obliczamy wartości fali
-y = amplitude * np.sign(np.sin(2 * np.pi * frequency * t + phase))
-
 # zakłócenie trójkątne
 # https://pl.wikipedia.org/wiki/Rozkład_trójkątny
 def Z_trojkatne(a=-1, b=1):
@@ -37,7 +25,7 @@ def z1():
     # generacja sygnału
     b = [1.5, 0.8, 1.3]
     y_list = list()
-    for i in range(10000):
+    for i in range(1000):
         u = (random.random()*2)-1
         y = 0
         y_list.append((u,None))
@@ -93,3 +81,53 @@ print("1. Zidentyfikowane parametry b:", b)
 # plt.scatter(t, y)
 # plt.show()
 
+
+def z2():
+    # generacja sygnału
+    b = [1.5, 1, 1.3]
+    y_list = list()
+
+    # Definiujemy parametry fali
+    amplitude = 0.2
+    frequency = 0.008
+
+    P = np.eye(len(b)) * 1000
+    bi = np.array([1, 1, 1])
+
+    u = 0
+
+    for i in range(1000):
+
+        ## SYMULACJA
+        #zmiana b1 w czasie
+        b[1] = 1 + amplitude * np.sign(np.sin(2 * np.pi * frequency * i))
+
+        y = 0
+        y_list.append((u,None))
+        if len(y_list) < len(b):
+            continue
+        for ii in range(len(b)):
+            y += b[ii]*y_list[-ii-1][0]
+
+        y += Z_trojkatne(-0.2, 0.2)
+
+        y_list[-1] = (u, y)
+
+        ## IDENTYFIKACJA
+        bi, P = identyfkacja(y_list, i, bi, P, lambd=0.9) # lambd - zapominanie
+
+        ## Wyznaczenie u
+        u = (1 - bi[1]*y_list[-1][0] - bi[2]*y_list[-2][0]) / bi[0]
+
+    return y_list
+
+
+y_list = z2()
+
+y = [y[1] for y in y_list]
+y = np.array(y)
+# t = [y[0] for y in y_list]
+# t = np.array(t)
+t = np.linspace(0, 2, 1000)
+plt.plot(t, y)
+plt.show()
