@@ -114,7 +114,7 @@ def z2():
         y_list[-1] = (u, y)
 
         ## IDENTYFIKACJA
-        bi, P = identyfkacja(y_list, i, bi, P, lambd=0.9) # lambd - zapominanie
+        bi, P = identyfkacja(y_list, i, bi, P, lambd=0.9) # lambd - zapominanie (1 - nie zapomina, 0 - zapomina wszystko)
 
         ## Wyznaczenie u
         u = (1 - bi[1]*y_list[-1][0] - bi[2]*y_list[-2][0]) / bi[0]
