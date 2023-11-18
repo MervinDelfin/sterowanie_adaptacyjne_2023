@@ -46,30 +46,50 @@ def z1():
         for ii in range(len(b)):
             y += b[ii]*y_list[-ii-1][0]
 
-        y += Z_trojkatne(-0.3, 0.3)
+        y += Z_trojkatne(-0.2, 0.2)
 
         y_list[-1] = (u, y)
 
-    # dentyfikacja parametów b*
-    theta = np.ones(len(b))
-    P = np.eye(len(b), dtype='int') * 1000 # macierz kowariancji
-
-    for i in range(len(y_list)):
-        if y_list[i][1] == None:
-            continue
-        x = np.array([y_list[i-ii-1][0] for ii in range(len(b))])
-        x = np.flip(x)
-        x = np.array([x])
-        P = P - (P @ x.T @ x @ P) / (1 + x @ P @ x.T)
-        theta = theta + P @ x.T * (y_list[i][1] - x @ theta.T)
-    print(theta)
-
     return y_list
 
-l = z1()
-y_list = [y[1] for y in l]
-y_list = np.array(y_list)
-t = [y[0] for y in l]
-t = np.array(t)
-plt.scatter(t, y_list)
-plt.show()
+y_list = z1()
+
+def identyfkacja(y_list, i, b, P, lambd=1):
+    phi = np.array([y[0] for y in y_list[i-3+1:i+1][::-1]])
+
+    # Calculate the predicted outputs
+    y_pred = np.dot(b, phi)
+
+    # Calculate the error
+    e = y_list[i][1] - y_pred
+
+    P = 1/lambd * (P - np.dot(P, np.dot(phi.T, np.dot(phi, P))) / (lambd + np.dot(phi, np.dot(P, phi.T))))
+
+    # Calculate the gain vector
+    K = np.dot(P, phi)
+
+    # Update the parameter vector
+    b = b + np.dot(K, e)
+
+    return b, P
+
+# Initialize the parameter vector b
+b = np.array([1, 1, 1])
+
+# Initialize the covariance matrix P
+P = np.eye(len(b)) * 1000
+
+# Iterate through the data points
+for i in range(2, len(y_list)):
+   b, P = identyfkacja(y_list, i, b, P)
+
+# Print the identified parameters
+print("1. Zidentyfikowane parametry b:", b)
+
+# y = [y[1] for y in y_list]
+# y = np.array(y)
+# # t = [y[0] for y in y_list]
+# # t = np.array(t)
+# plt.scatter(t, y)
+# plt.show()
+
