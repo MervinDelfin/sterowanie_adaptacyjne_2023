@@ -57,7 +57,7 @@ def identyfikacja():
     Wlist = np.array(Wlist)
     A, B = [0,0], [0,0]
     for ii in range(2):
-        A[ii], B[ii] = (np.dot(Ylist[ii].T , Wlist[ii]) @ np.linalg.inv(Wlist[ii].T @ Wlist[ii]))[0]
+        B[ii], A[ii] = (np.dot(Ylist[ii].T , Wlist[ii]) @ np.linalg.inv(Wlist[ii].T @ Wlist[ii]))[0]
 
     return A, B
 
@@ -92,10 +92,10 @@ def obiekt(U, A, B):
 def Q(u1, u2, A, B, none=False):
 
     #ograniczenie 
-    if u1[0]**2 + u2[0]**2 <= 1:
-        if none:
-            return None
-        return 99999999 - 1000* (u1[0]**2 + u2[0]**2)
+    # if u1[0]**2 + u2[0]**2 > 1:
+    #     if none:
+    #         return None
+    #     return 100000* (u1[0]**2 + u2[0]**2)
 
     U, Y = obiekt(np.array([u1, u2]), A, B)
 
@@ -103,12 +103,12 @@ def Q(u1, u2, A, B, none=False):
     
 
 def Q1(u2, A, B):
-    u1opt = fmin(Q, [0], args=(u2,A,B), maxiter=1000, disp=False)
+    u1opt = fmin(Q, [0], args=(u2,A,B), xtol=1e-18, ftol=1e-18, disp=False)
     return Q(u1opt, u2, A, B)
 
 #Metoda Neldera-Meada
-u2opt = fmin(Q1, [0], args=(A,B), maxiter=1000)[0]
-u1opt = fmin(Q, [5], args=([u2opt],A,B), maxiter=1000, disp=False)[0]
+u2opt = fmin(Q1, [0], args=(A,B), xtol=1e-16, ftol=1e-18)[0]
+u1opt = fmin(Q, [0], args=([u2opt],A,B), xtol=1e-6, ftol=1e-8, disp=False)[0]
 print("u1opt =", u1opt)
 print("u2opt =", u2opt)
 print("Q min =", Q([u1opt], [u2opt], A, B))
@@ -124,6 +124,8 @@ def fig1():
     NUM_POINTS = 100
     u1 = np.linspace(-4, 4, NUM_POINTS)
     u2 = np.linspace(-4, 4, NUM_POINTS)
+    # u1 = np.linspace(-1, 1, NUM_POINTS)
+    # u2 = np.linspace(-1, 1, NUM_POINTS)
     u1, u2 = np.meshgrid(u1, u2)
     Qlist = np.array([[Q([u1[ii, jj]], [u2[ii, jj]], A, B, none=True) for ii in range(NUM_POINTS)] for jj in range(NUM_POINTS)])
 
@@ -141,8 +143,9 @@ def fig2():
     ax = plt.axes(projection='3d')
 
     NUM_POINTS = 100
-    u1 = np.linspace(u1opt-0.001, u1opt+0.001, NUM_POINTS)
-    u2 = np.linspace(u2opt-0.001, u2opt+0.001, NUM_POINTS)
+    DISTANCE = 1
+    u1 = np.linspace(u1opt-DISTANCE, u1opt+DISTANCE, NUM_POINTS)
+    u2 = np.linspace(u2opt-DISTANCE, u2opt+DISTANCE, NUM_POINTS)
     u1, u2 = np.meshgrid(u1, u2)
     Qlist = np.array([[Q([u1[ii, jj]], [u2[ii, jj]], A, B, none=True) for ii in range(NUM_POINTS)] for jj in range(NUM_POINTS)])
 
@@ -154,5 +157,5 @@ def fig2():
     ax.set_zlabel('Q')
     plt.show()
 
-fig1()
+# fig1()
 fig2()
